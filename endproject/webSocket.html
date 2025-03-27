@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-Time Vehicle Tracking</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRbSJ1lMyFVudmk5JZUfUF1Yku_8sb5qs&callback=initMap" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Vehicle Tracking on Real-Time</h2>
+    <div id="map"></div>
+
+    <script>
+        let map;
+        let marker;
+        let polyline;
+        let socket = io("http://127.0.0.1:5000"); // Connect to Flask-SocketIO
+
+        function initMap() {
+            let startLocation = { lat: -1.286389, lng: 36.817223 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: startLocation,
+                zoom: 12,
+            });
+
+            marker = new google.maps.Marker({
+                position: startLocation,
+                map: map,
+                title: "Vehicle Location",
+                icon: "https://maps.google.com/mapfiles/kml/shapes/cabs.png"
+            });
+
+            polyline = new google.maps.Polyline({
+                path: [],
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 4,
+                map: map
+            });
+
+            // Listen for real-time updates from Flask-SocketIO
+            socket.on("vehicle_update", function (data) {
+                let newLocation = { lat: data.latitude, lng: data.longitude };
+
+                marker.setPosition(newLocation);
+                let path = polyline.getPath();
+                path.push(newLocation);
+
+                map.setCenter(newLocation);
+            });
+        }
+    </script>
+
+</body>
+</html>

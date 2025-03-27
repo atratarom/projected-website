@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Optimization with User Inputs</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; }
+    </style>
+</head>
+<body>
+
+    <h2>Click on the map to select start and destination points</h2>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        const map = L.map("map").setView([0.0236, 37.9062], 8);
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> contributors'
+        }).addTo(map);
+
+        const apiKey = "66c1399c-26c3-47f4-9686-c08ff32e921c"; // Replace with your GraphHopper API key
+
+        let startMarker, endMarker;
+        let startPoint = null, endPoint = null;
+
+        // Handle map clicks for user input
+        map.on("click", function (e) {
+            if (!startPoint) {
+                startPoint = e.latlng;
+                startMarker = L.marker(startPoint).addTo(map).bindPopup("Start Point").openPopup();
+            } else if (!endPoint) {
+                endPoint = e.latlng;
+                endMarker = L.marker(endPoint).addTo(map).bindPopup("Destination").openPopup();
+                
+                // Call function to get and draw route
+                getRoute(startPoint, endPoint);
+            }
+        });
+
+        // Function to fetch and display optimized route
+        async function getRoute(start, end) {
+            const url = https://graphhopper.com/api/1/route?point=${start.lat},${start.lng}&point=${end.lat},${end.lng}&profile=car&locale=en&calc_points=true&key=${66c1399c-26c3-47f4-9686-c08ff32e921c};
+            
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.paths) {
+                const points = data.paths[0].points.coordinates.map(coord => [coord[1], coord[0]]);
+                L.polyline(points, { color: "blue" }).addTo(map);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+form {
+	display: 50%;
+	flex-direction: column;
+	text-align: center;
+	border-radius: 10px;
+	background-color: white;
+	width: 70%;
+	margin: auto;
+}
+
+.container {
+    max-width: 50%;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+body {
+	background-color: #2575fc;
+	font-family: 'Poppins', sans-serif;
+}
+
+.form-container {
+	background-color: orange;
+	border: 5px solid black;
+	border-radius: 15px;
+	padding: 20px;
+	box-shadow: 12px solid maroon;
+	width: 60%;
+	transition: 0.4s;
+}
+
+button {
+	padding: 12px;
+	background-color: #6a11cb;
+	color: white;
+	border: none;
+	border-radius: 7px;
+	cursor: pointer;
+	font-weight: 600;
+	width: 35%;
+}
+
+input {
+	width: 100%;
+	
+	
+}
+
+input[type=text] {
+	width: 70%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: none;
+	background-color: lightblue;
+}
+
+input[type=password] {
+	width: 70%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: none;
+	background-color: lightblue;
+}
+
+input[type=tel] {
+	width: 70%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: none;
+	background-color: lightblue;
+}
+
+input[type=reset] {
+	cursor: pointer;
+	margin: 8px 0 8px 0;
+	box-sizing: border-box;
+	width: 70%;
+	background-color: red;
+	border-radius: 5px;
+}
+
+input[type=submit] {
+	cursor: pointer;
+	margin: 8px 0 8px 0;
+	box-sizing: border-box;
+	width: 70%;
+	background-color: #2575fc;
+	border-radius: 5px;
+}

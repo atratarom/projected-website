@@ -1,0 +1,58 @@
+form {
+	text-align: center;
+	background-color: white;
+	border-radius: 10px;
+	font-family: 'Poppins', sans-serif;
+	width: 70%;
+	margin: auto;
+}
+
+input {
+	width: 45%;
+	font-size: 15px;
+}
+
+input[type=text] {
+	width: 70%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: none;
+	background-color: lightblue;
+}
+
+input[type=password] {
+	width: 70%;
+	padding: 12px 20px;
+	margin: 8px 0;
+	box-sizing: border-box;
+	border-radius: 5px;
+	border: none;
+	background-color: lightblue;
+}
+
+input[type=submit] {
+	background-color: lightgreen;
+	cursor: pointer;
+	margin: 8px 0 8px 0;
+	box-sizing: border-box;
+	width: 70%;
+	border-radius: 5px;
+}
+
+
+button {
+	padding: 12px;
+	background-color: #6a11cb;
+	color: white;
+	border: none;
+	border-radius: 7px;
+	cursor: pointer;
+	font-weight: 600;
+	width: 70%;
+}
+
+body {
+	background-color: #2575fc;
+}
