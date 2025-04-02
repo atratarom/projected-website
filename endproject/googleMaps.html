@@ -2,7 +2,10 @@
 <html>
 <head>
     <title>Live Vehicle Tracking</title>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRbSJ1lMyFVudmk5JZUfUF1Yku_8sb5qs&libraries=geometry&callback=initMap" async defer></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.1/mapbox-gl.js"></script>
     <style>
         #map {
             height: 100vh;
@@ -16,85 +19,106 @@
     <div id="map"></div>
 
     <script>
+        // Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your actual Mapbox access token
+        mapboxgl.accessToken = 'pk.eyJ1IjoibXV2YXNpIiwiYSI6ImNtOHo3Ym82NDA3eGIybnNpYzdzeG5ueDUifQ.4eJXMXYUywFKz8-TgcfXEQ';
         let map;
         let marker;
-        let directionsService;
-        let directionsRenderer;
-        let polyline;
+        let polyline = [];
 
         function initMap() {
-            // Default starting location (e.g., Nairobi)
-            let startLocation = { latitude: -1.286389, longitude: 36.817223 };
+            // Default starting location
+            let startLocation = [-1.286389, 36.817223]; // [lng, lat]
 
             // Initialize the map
-            map = new google.maps.Map(document.getElementById("map"), {
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v11', // Choose your style
                 center: startLocation,
-                zoom: 12,
+                zoom: 12
             });
 
             // Add vehicle marker
-            marker = new google.maps.Marker({
-                position: startLocation,
-                map: map,
-                title: "Live Location",
-                icon: "https://maps.google.com/mapfiles/kml/shapes/cabs.png"
-            });
-
-            // Initialize Directions API services
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer({ map: map });
-
-            // Create a polyline for live tracking
-            polyline = new google.maps.Polyline({
-                path: [],
-                geodesic: true,
-                strokeColor: "#FF0000",
-                strokeOpacity: 1.0,
-                strokeWeight: 4,
-                map: map
-            });
+            marker = new mapboxgl.Marker({
+                color: 'red'
+            })
+            .setLngLat(startLocation)
+            .addTo(map);
 
             // Call updateVehicleLocation every 5 seconds
             setInterval(updateVehicleLocation, 5000);
 
-            // Get route from the start location to destination
-            drawRoute("Nairobi, Kenya", "Naivasha, Kenya");
+            // Draw initial route
+            drawRoute(startLocation, [-1.200, 36.800]); // Example destination
         }
 
         function drawRoute(start, end) {
-            let request = {
-                origin: start,
-                destination: end,
-                travelMode: 'DRIVING'
-            };
+            // Use Mapbox Directions API to get the route
+            const url = `https://api.mapbox.com/optimized-trips/v1/mapbox/driving/${start.join(',')};${end.join(',')}?access_token=${mapboxgl.accessToken}`;
 
-            directionsService.route(request, function (result, status) {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(result);
-                } else {
-                    console.error("Error getting route:", status);
-                }
-            });
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const route = data.routes[0].geometry.coordinates;
+                    polyline = route;
+
+                    // Draw the route on the map
+                    map.addSource('route', {
+                        'type': 'geojson',
+                        'data': {
+                            'type': 'Feature',
+                            'geometry': {
+                                'type': 'LineString',
+                                'coordinates': route
+                            }
+                        }
+                    });
+
+                    map.addLayer({
+                        'id': 'route',
+                        'type': 'line',
+                        'source': 'route',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': '#FF0000',
+                            'line-width': 4
+                        }
+                    });
+                })
+                .catch(error => console.error("Error getting route:", error));
         }
 
         function updateVehicleLocation() {
-            fetch("http://127.0.0.1:5000/track")  // Replace with your actual API
+            fetch("/track")  // Replace with your actual API
                 .then(response => response.json())
                 .then(data => {
-                    let newLocation = { latitude: data.latitude, longitude: data.longitude };
+                    let newLocation = [data.lng, data.lat]; // [lng, lat]
 
                     // Update marker position
-                    marker.setPosition(newLocation);
+                    marker.setLngLat(newLocation);
 
                     // Add new location to polyline path
-                    let path = polyline.getPath();
-                    path.push(newLocation);
+                    polyline.push(newLocation);
+
+                    // Update the route on the map
+                    map.getSource('route').setData({
+                        'type': 'Feature',
+                        'geometry': {
+                            'type': 'LineString',
+                            'coordinates': polyline
+                        }
+                    });
 
                     // Center map on vehicle
                     map.setCenter(newLocation);
                 })
                 .catch(error => console.error("Error fetching vehicle location:", error));
         }
+
+        // Initialize the map
+        initMap();
     </script>
 
 </body>
